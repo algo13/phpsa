@@ -24,13 +24,17 @@ class ReturnAndYieldInOneMethod implements Pass\AnalyzerPassInterface
      */
     public function pass(Node\FunctionLike $func, Context $context)
     {
-        $yieldExists = \PHPSA\generatorHasValue($this->findYieldExpression($func->getStmts()));
+        $stmts = $func->getStmts();
+        if ($stmts === null) {
+            return false;
+        }
+        $yieldExists = \PHPSA\generatorHasValue($this->findYieldExpression($stmts));
         if (!$yieldExists) {
             // YieldFrom is another expression
-            $yieldExists = \PHPSA\generatorHasValue($this->findNode($func->getStmts(), Expr\YieldFrom::class));
+            $yieldExists = \PHPSA\generatorHasValue($this->findNode($stmts, Expr\YieldFrom::class));
         }
 
-        if ($yieldExists && \PHPSA\generatorHasValue($this->findReturnStatement($func->getStmts()))) {
+        if ($yieldExists && \PHPSA\generatorHasValue($this->findReturnStatement($stmts))) {
             $context->notice('return_and_yield_in_one_method', 'Do not use return and yield in a one method', $func);
             return true;
         }
