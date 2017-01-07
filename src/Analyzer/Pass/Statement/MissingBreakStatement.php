@@ -57,6 +57,7 @@ class MissingBreakStatement implements Pass\AnalyzerPassInterface
      */
     private function checkCaseStatement(Stmt\Case_ $case, Context $context)
     {
+        $stmtsCount = count($case->stmts);
         /*
          * switch(…) {
          *     case 41:
@@ -65,20 +66,14 @@ class MissingBreakStatement implements Pass\AnalyzerPassInterface
          *         return 'the truth, or almost.';
          * }
          */
-        if (!$case->stmts) {
+        if ($stmtsCount === 0) {
             return false;
         }
 
-        foreach ($case->stmts as $node) {
-            // look for a break statement
-            if ($node instanceof Stmt\Break_) {
-                return false;
-            }
-
-            // or for a return
-            if ($node instanceof Stmt\Return_) {
-                return false;
-            }
+        $last = $case->stmts[$stmtsCount - 1];
+        if ($last instanceof Stmt\Break_ || $last instanceof Stmt\Return_
+        || $last instanceof Stmt\Throw_ || $last instanceof Stmt\Continue_) {
+            return false;
         }
 
         $context->notice(
