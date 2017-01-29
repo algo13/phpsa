@@ -75,6 +75,7 @@ class MissingBreakStatement implements Pass\AnalyzerPassInterface
             || $stmt instanceof Stmt\Throw_ || $stmt instanceof Stmt\Continue_) {
                 break;
             }
+
             if (!$stmt instanceof Stmt\Nop) {
                 $context->notice(
                     'missing_break_statement',
@@ -84,6 +85,7 @@ class MissingBreakStatement implements Pass\AnalyzerPassInterface
 
                 return true;
             }
+
             $stmt = prev($case->stmts);
         }
 
